@@ -3,7 +3,7 @@
 class VAuth extends CComponent {
 
     /**
-     * to generate group of users     
+     * to generate users by group    
      */
     public static function getUsers($group_id=null) {
         //set group id from getGroupId if there is no input from param
@@ -27,6 +27,9 @@ class VAuth extends CComponent {
         return $data;
     }
 
+    /**
+     * to get list of actions by classname and group id
+     */
     public static function getActions($className='default',$group_id=null){                
         //set group id from getGroupId if there is no input from param
         if(!$group_id)
@@ -52,6 +55,9 @@ class VAuth extends CComponent {
         return $data;        
     }
 
+    /**
+     * to get user by login id
+     */
     public static function getGroupId(){
         $user_id = Yii::app()->user->id;
 
