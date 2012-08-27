@@ -1,6 +1,5 @@
 <?php
 
-Yii::import('ext.vlo.auth.VAuth');
 
 class UserController extends Controller {
 

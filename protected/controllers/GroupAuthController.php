@@ -1,7 +1,5 @@
 <?php
 
-Yii::import('ext.vlo.auth.VAuth');
-
 class GroupAuthController extends Controller {
 
     /**
