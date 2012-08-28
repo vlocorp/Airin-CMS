@@ -95,10 +95,14 @@ class PostController extends Controller {
         $model = $this->loadModel($id);
 
         // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
+        $this->performAjaxValidation($model);
 
         if (isset($_POST['Post'])) {
             $model->attributes = $_POST['Post'];
+            $VUpload = new VUpload();
+            $VUpload->path = 'images/post/';
+            $VUpload->doUpload($model, 'image');
+            
             if ($model->save())
                 $this->redirect(array('view', 'id' => $model->id));
         }
@@ -237,6 +241,11 @@ class PostController extends Controller {
     public function createCategory(){
         $model = new Category;
         
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'category-form') {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+        
         if(isset($_POST['Category'])){
             $model->attributes = $_POST['Category'];
             
@@ -252,6 +261,11 @@ class PostController extends Controller {
      */
     public function createSubCategory(){
         $model = new SubCategory;
+        
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'sub-category-form') {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
         
         if(isset($_POST['SubCategory'])){
             $model->attributes = $_POST['SubCategory'];
