@@ -36,3 +36,16 @@ $this->menu=array(
 		'update_time',
 	),
 )); ?>
+
+<br/>
+
+<h3>Add Comment</h3>
+<?php $this->renderPartial('/comment/_form', array(
+    'model'=>$createComment,
+));?>   
+
+<h3>List Comment</h3>
+<?php $this->widget('zii.widgets.CListView',array(
+        'dataProvider'=>$commentDataProvider,
+        'itemView'=>'/comment/_view',
+));?>

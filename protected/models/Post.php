@@ -67,6 +67,7 @@ class Post extends VAbstractActiveRecord {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
+            'comments' => array(self::HAS_MANY, 'Comment', 'post_id'),
             'category' => array(self::BELONGS_TO, 'Category', 'category_id'),
             'subCategory' => array(self::BELONGS_TO, 'SubCategory', 'sub_category_id'),
             'user' => array(self::BELONGS_TO, 'User', 'user_id'),

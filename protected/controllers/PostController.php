@@ -20,6 +20,16 @@ class PostController extends Controller {
         );
     }
 
+    public function actions() {
+        return array(
+            // captcha action renders the CAPTCHA image displayed on the user registration page
+            'captcha' => array(
+                'class' => 'CCaptchaAction',
+                'backColor' => 0xFFFFFF,
+            ),
+        );
+    }
+
     /**
      * Specifies the access control rules.
      * This method is used by the 'accessControl' filter.
@@ -28,11 +38,11 @@ class PostController extends Controller {
     public function accessRules() {
         return array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'getSubCategoryOptions'),
+                'actions' => array('index', 'view', 'getSubCategoryOptions','captcha'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'uploadRedactor','setActive','setHot'),
+                'actions' => array('create', 'update', 'uploadRedactor', 'setActive', 'setHot'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -50,9 +60,45 @@ class PostController extends Controller {
      * @param integer $id the ID of the model to be displayed
      */
     public function actionView($id) {
+        $commentDataProvider = new CActiveDataProvider('Comment', array(
+                    'criteria' => array(
+                        'condition' => 'post_id=:post_id',
+                        'params' => array(
+                            ':post_id' => $id,
+                        ),
+                    ),
+                ));
+
         $this->render('view', array(
             'model' => $this->loadModel($id),
+            'commentDataProvider' => $commentDataProvider,
+            'createComment' => $this->createComment($id),
         ));
+    }
+
+    /**
+     * function to create new comment
+     * @param type $id
+     * @return \Comment
+     */
+    public function createComment($id) {
+        $model = new Comment;
+
+        if (isset($_POST['ajax']) && $_POST['ajax'] === 'comment-form') {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+
+        if (isset($_POST['Comment'])) {
+            $model->attributes = $_POST['Comment'];
+            $model->post_id = $id;
+            $model->user_id = Yii::app()->user->id;
+
+            if ($model->save()) {
+                $this->redirect('view/' . $id);
+            }
+        }
+        return $model;
     }
 
     /**
@@ -77,12 +123,12 @@ class PostController extends Controller {
 
         //creating category
         $this->createCategory();
-        
+
         //creating sub category
         $this->createSubCategory();
-        
+
         $this->render('create', array(
-            'model' => $model,            
+            'model' => $model,
         ));
     }
 
@@ -102,7 +148,7 @@ class PostController extends Controller {
             $VUpload = new VUpload();
             $VUpload->path = 'images/post/';
             $VUpload->doUpload($model, 'image');
-            
+
             if ($model->save())
                 $this->redirect(array('view', 'id' => $model->id));
         }
@@ -117,11 +163,11 @@ class PostController extends Controller {
      * If deletion is successful, the browser will be redirected to the 'admin' page.
      * @param integer $id the ID of the model to be deleted
      */
-    public function actionDelete($id) {        
+    public function actionDelete($id) {
         $model = $this->loadModel($id);
         $VUpload = new VUpload();
         $VUpload->path = 'images/post/';
-        $VUpload->doDelete($model, 'image');        
+        $VUpload->doDelete($model, 'image');
         $model->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
@@ -179,10 +225,9 @@ class PostController extends Controller {
     /**
      * dropDownList for category form     
      */
-    protected function getCategoryOptions() {        
+    protected function getCategoryOptions() {
         return CHtml::listData(Category::model()->findAll(), 'id', 'name');
     }
-
 
     /**
      * dropDownList for active form     
@@ -212,13 +257,13 @@ class PostController extends Controller {
         $model = SubCategory::model()->findAllByAttributes(array(
             'category_id' => $category_id
                 ));
-                
-        $option = array(''=>'Set Null');
-        $options = CHtml::listData($model, 'id', 'name');        
-        $options = CMap::mergeArray($option, $options);        
-        echo json_encode($options);        
+
+        $option = array('' => 'Set Null');
+        $options = CHtml::listData($model, 'id', 'name');
+        $options = CMap::mergeArray($option, $options);
+        echo json_encode($options);
     }
-    
+
     public function actionUploadRedactor($get = null, $type = null) {
         Yii::import('ext.vlo.redactorjs.Redactor');
         $redactor = new Redactor();
@@ -237,45 +282,45 @@ class PostController extends Controller {
             }
         }
     }
-    
+
     /**
      * dialog createCategory
      * @return \Category
      */
-    public function createCategory(){
+    public function createCategory() {
         $model = new Category;
-        
+
         if (isset($_POST['ajax']) && $_POST['ajax'] === 'category-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
-        
-        if(isset($_POST['Category'])){
+
+        if (isset($_POST['Category'])) {
             $model->attributes = $_POST['Category'];
-            
-            if($model->save())
-                $this->redirect(array('post/create'));            
+
+            if ($model->save())
+                $this->redirect(array('post/create'));
         }
         return $model;
     }
-    
+
     /**
      * dialog createSubCategory
      * @return \Category
      */
-    public function createSubCategory(){
+    public function createSubCategory() {
         $model = new SubCategory;
-        
+
         if (isset($_POST['ajax']) && $_POST['ajax'] === 'sub-category-form') {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
-        
-        if(isset($_POST['SubCategory'])){
+
+        if (isset($_POST['SubCategory'])) {
             $model->attributes = $_POST['SubCategory'];
-            
-            if($model->save())
-                $this->redirect(array('post/create'));            
+
+            if ($model->save())
+                $this->redirect(array('post/create'));
         }
         return $model;
     }
@@ -283,39 +328,39 @@ class PostController extends Controller {
     /**
      * function to set post active or not
      */
-    public function actionSetActive($id){
+    public function actionSetActive($id) {
         $model = $this->loadModel($id);
         $active = $model->active;
-        
-        if($active == 1){
+
+        if ($active == 1) {
             $model->active = 0;
             $model->update();
-        }else{
+        } else {
             $model->active = 1;
             $model->update();
         }
-        
+
         if (!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
     }
-    
+
     /**
      * function to set post hot or not
      */
-    public function actionSetHot($id){
+    public function actionSetHot($id) {
         $model = $this->loadModel($id);
         $hot = $model->hot;
-        
-        if($hot == 1){
+
+        if ($hot == 1) {
             $model->hot = 0;
             $model->update();
-        }else{
+        } else {
             $model->hot = 1;
             $model->update();
         }
-        
+
         if (!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
     }
-    
+
 }
