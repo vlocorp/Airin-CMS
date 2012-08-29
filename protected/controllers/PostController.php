@@ -32,7 +32,7 @@ class PostController extends Controller {
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'uploadRedactor'),
+                'actions' => array('create', 'update', 'uploadRedactor','setActive','setHot'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -216,7 +216,7 @@ class PostController extends Controller {
         $option = array(''=>'Set Null');
         $options = CHtml::listData($model, 'id', 'name');        
         $options = CMap::mergeArray($option, $options);        
-        echo json_encode($options);
+        echo json_encode($options);        
     }
     
     public function actionUploadRedactor($get = null, $type = null) {
@@ -280,4 +280,42 @@ class PostController extends Controller {
         return $model;
     }
 
+    /**
+     * function to set post active or not
+     */
+    public function actionSetActive($id){
+        $model = $this->loadModel($id);
+        $active = $model->active;
+        
+        if($active == 1){
+            $model->active = 0;
+            $model->update();
+        }else{
+            $model->active = 1;
+            $model->update();
+        }
+        
+        if (!isset($_GET['ajax']))
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+    }
+    
+    /**
+     * function to set post hot or not
+     */
+    public function actionSetHot($id){
+        $model = $this->loadModel($id);
+        $hot = $model->hot;
+        
+        if($hot == 1){
+            $model->hot = 0;
+            $model->update();
+        }else{
+            $model->hot = 1;
+            $model->update();
+        }
+        
+        if (!isset($_GET['ajax']))
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+    }
+    
 }

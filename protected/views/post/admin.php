@@ -44,8 +44,8 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 	'id'=>'post-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
-	'columns'=>array(
-		'id',
+	'columns'=>array(		
+                'id',
 		array(
                     'header'=>'User',
                     'filter'=>  CHtml::listData(User::model()->findAll(), 'id', 'username'),
@@ -88,6 +88,19 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		*/
 		array(
 			'class'=>'CButtonColumn',
+                        'template'=>'{update}{delete}{view}{active}{hot}',
+                        'buttons'=>array(
+                            'active'=>array(
+                                'label'=>'active',
+                                'url'=>'Yii::app()->createUrl("post/setActive", array("id"=>$data->id))',                                
+                                'imageUrl'=>Yii::app()->request->baseUrl.'/images/icon/visible.png'                                
+                            ),
+                            'hot'=>array(
+                                'label'=>'hot',
+                                'url'=>'Yii::app()->createUrl("post/setHot", array("id"=>$data->id))',                                
+                                'imageUrl'=>Yii::app()->request->baseUrl.'/images/icon/hot2.png'                                
+                            ),
+                        ),                        
 		),
 	),
 )); ?>
