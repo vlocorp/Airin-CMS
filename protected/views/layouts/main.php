@@ -35,6 +35,7 @@
 				array('label'=>'Menu Management', 'url'=>array('/menu')),
 				array('label'=>'User Management', 'url'=>array('/user')),
 				array('label'=>'Group Management', 'url'=>array('/group')),
+				array('label'=>'Post Management', 'url'=>array('/post')),
 				array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
 			),
